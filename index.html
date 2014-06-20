@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">	
+    <meta content='True' name='HandheldFriendly' />
+    <meta content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' name='viewport' />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="apple-mobile-web-app-capable" content="yes" /> 
+
+    <script type="text/javascript">
+        var global = {};
+        global.connected = true;
+        global.connectionCnt = 0;
+    </script>
+    
+    <script type="text/javascript">
+        function doesConnectionExist() {
+            var xhr = new XMLHttpRequest();
+            var file = "http://www.abeland.dk/services/calc/ping.png";
+            var randomNum = Math.round(Math.random() * 10000);
+            xhr.open('HEAD', file + "?rand=" + randomNum, false);
+     
+            try {
+                xhr.send();
+         
+                if (xhr.status >= 200 && xhr.status < 304) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        function infoConnection() {
+            global.connectionCnt++;
+            if(global.connectionCnt>20) {
+                global.connectionCnt=0;
+            }
+            var t = "<center><br><br>No internet connection.<br>Please check your connection.<br><br><br>Searching<br>";
+            for(i=0;i<Math.abs(10-global.connectionCnt);i++) t += ".";
+            t += "</center>";
+            document.getElementById("full").innerHTML = t;
+        }
+        
+        function testConnection() {
+            if(!doesConnectionExist()) {
+                if(global.connected) {
+                    setInterval(function(){infoConnection();},50);
+                    setInterval(function(){testConnection();},2000);
+                }
+                global.connected = false;
+            } else {
+                if(!global.connected) {
+                    location.reload();
+                }             
+                setTimeout(function(){testConnection();},10000);
+            }
+        }
+
+        setTimeout(function(){testConnection();},5000);
+    </script>
+</head>
+<body>
+<div id="full" class="layFullscreen" style="z-index:1;visibility: hidden"></div>
+<script type="text/javascript" src="http://www.abeland.dk/services/calc/php/sync.php?DEV=1"></script>
+</body>
+</html>
