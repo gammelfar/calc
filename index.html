@@ -41,7 +41,11 @@
             var t = "<center><br><br>No internet connection.<br>Please check your connection.<br><br><br>Searching<br>";
             for(i=0;i<Math.abs(10-global.connectionCnt);i++) t += ".";
             t += "</center>";
-            document.getElementById("full").innerHTML = t;
+            
+            var e = document.getElementById("full");
+            if(e)e.style.visibility = "visible";
+            if(e)e.style.display = "block";
+            e.innerHTML = t;
         }
         
         function testConnection() {
