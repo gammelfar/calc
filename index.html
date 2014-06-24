@@ -11,20 +11,29 @@
         var global = {};
         global.connected = true;
         global.connectionCnt = 0;
-    </script>
+        global.initialized = false;
+        global.server = "http://www.abeland.dk/services/calc/";
+        global.buffer = null;
     
-    <script type="text/javascript">
-        function doesConnectionExist() {
+        global.eval = function(code) {
+            try {
+                eval(code);
+            } catch (e) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        global.geturl = function(url) {
+            global.initialized = true;
             var xhr = new XMLHttpRequest();
-            var file = "http://www.abeland.dk/services/calc/ping.png";
             var randomNum = Math.round(Math.random() * 10000);
-            xhr.open('HEAD', file + "?rand=" + randomNum, false);
-     
+            xhr.open('HEAD', global.server + url + "?rand=" + randomNum, false);
             try {
                 xhr.send();
-         
                 if (xhr.status >= 200 && xhr.status < 304) {
-                    return true;
+                    global.buffer = xhr.responseText;
+                     return true;
                 } else {
                     return false;
                 }
@@ -33,7 +42,25 @@
             }
         }
         
-        function infoConnection() {
+        global.initialize = function() {
+            global.initialized = true;
+            if(!global.geturl("php/sync.php")) {
+                return false;
+            }
+            global.eval(global.buffer);
+        }
+        
+        global.doesConnectionExist = function() {
+            if(!global.geturl("php/ping.php")) {
+                return false;
+            }
+            global.eval(global.buffer);
+            if(!global.initialized) {
+                return global.initialize();
+            }
+        }
+        
+        global.infoConnection = function() {
             global.connectionCnt++;
             if(global.connectionCnt>20) {
                 global.connectionCnt=0;
@@ -42,32 +69,39 @@
             for(i=0;i<Math.abs(10-global.connectionCnt);i++) t += ".";
             t += "</center>";
             
-            var e = document.getElementById("full");
+            var e = document.getElementById("div_fullscreen");
             if(e)e.style.visibility = "visible";
             if(e)e.style.display = "block";
             e.innerHTML = t;
         }
         
-        function testConnection() {
-            if(!doesConnectionExist()) {
+        global.testConnection = function() {
+            if(!global.doesConnectionExist()) {
                 if(global.connected) {
-                    setInterval(function(){infoConnection();},50);
-                    setInterval(function(){testConnection();},2000);
+                    setInterval(function(){global.infoConnection();},50);
+                    setInterval(function(){gobal.testConnection();},2000);
                 }
                 global.connected = false;
             } else {
                 if(!global.connected) {
                     location.reload();
                 }             
-                setTimeout(function(){testConnection();},10000);
+                setTimeout(function(){global.testConnection();},10000);
             }
         }
-
-        setTimeout(function(){testConnection();},5000);
+        
+        global.start = function() {
+            if(typeof(localStorage)!=='undefined') {
+                global.eval(localStorage.getItem("startState"));
+            }
+            setTimeout(function(){global.testConnection();},50);
+        }
     </script>
 </head>
 <body>
-<div id="full" class="layFullscreen" style="z-index:1;visibility: hidden"></div>
-<script type="text/javascript" src="http://www.abeland.dk/services/calc/php/sync.php?DEV=1"></script>
+<div id="div_fullscreen" class="layFullscreen" style="z-index:1;visibility: hidden"></div>
+<script type="text/javascript">
+        global.start();
+</script>
 </body>
 </html>
