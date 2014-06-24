@@ -28,7 +28,7 @@
             global.initialized = true;
             var xhr = new XMLHttpRequest();
             var randomNum = Math.round(Math.random() * 10000);
-            xhr.open('HEAD', global.server + url + "?rand=" + randomNum, false);
+            xhr.open('GET', global.server + url + "?rand=" + randomNum, false);
             try {
                 xhr.send();
                 if (xhr.status >= 200 && xhr.status < 304) {
