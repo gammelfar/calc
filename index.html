@@ -25,7 +25,6 @@
         }
 
         global.geturl = function(url) {
-            global.initialized = true;
             var xhr = new XMLHttpRequest();
             var randomNum = Math.round(Math.random() * 10000);
             xhr.open('GET', global.server + url + "?rand=" + randomNum, false);
@@ -48,6 +47,7 @@
                 return false;
             }
             global.eval(global.buffer);
+            return true;
         }
         
         global.doesConnectionExist = function() {
