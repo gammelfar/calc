@@ -90,7 +90,9 @@
         
         global.testConnection = function() {
             if(!global.doesConnectionExist()) {
-                setTimeout(function(){global.infoConnection();},50);
+                if(global.connected) {
+                    setTimeout(function(){global.infoConnection();},50);
+                }
                 setTimeout(function(){global.testConnection();},2000);
                 global.connected = false;
             } else {
