@@ -15,6 +15,17 @@
         global.server = "http://www.abeland.dk/services/calc/";
         global.buffer = null;
     
+        global.restart = function() {
+            location.reload();
+        }
+        
+        global.info = function(t) {
+            var e = document.getElementById("div_fullscreen");
+            if(e)e.style.visibility = "visible";
+            if(e)e.style.display = "block";
+            e.innerHTML = t;
+        }
+        
         global.eval = function(code) {
             try {
                 eval(code);
@@ -62,6 +73,9 @@
         }
         
         global.infoConnection = function() {
+            if(global.connected) {
+                return;
+            }
             global.connectionCnt++;
             if(global.connectionCnt>20) {
                 global.connectionCnt=0;
@@ -69,25 +83,22 @@
             var t = "<center><br><br>No internet connection.<br>Please check your connection.<br><br><br>Searching<br>";
             for(i=0;i<Math.abs(10-global.connectionCnt);i++) t += ".";
             t += "</center>";
+            global.info(t);
             
-            var e = document.getElementById("div_fullscreen");
-            if(e)e.style.visibility = "visible";
-            if(e)e.style.display = "block";
-            e.innerHTML = t;
+            setTimeout(function(){global.infoConnection();},50);
         }
         
         global.testConnection = function() {
             if(!global.doesConnectionExist()) {
-                if(global.connected) {
-                    setInterval(function(){global.infoConnection();},50);
-                    setInterval(function(){gobal.testConnection();},2000);
-                }
+                setTimeout(function(){global.infoConnection();},50);
+                setTimeout(function(){global.testConnection();},2000);
                 global.connected = false;
             } else {
                 if(!global.connected) {
-                    location.reload();
-                }             
-                setTimeout(function(){global.testConnection();},10000);
+                    global.restart();
+                }
+                global.connected = true;
+                setTimeout(function(){global.testConnection();},5000);
             }
         }
         
